@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "fecha": "2026-03-13 09:57:12",
+        "cliente": "Juan Perez",
+        "nit_cc": "123456789",
+        "subtotal": 100.0,
+        "iva_porcentaje": 0.19,
+        "valor_iva": 19.0,
+        "total": 119.0
+    }
+]
