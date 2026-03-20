@@ -1,25 +1,27 @@
-# 📑 Sistema de Facturación API
+# 🧾 Sistema de Facturación SQL
 
-Este es un proyecto de gestión de facturación desarrollado con **FastAPI** para el backend y una interfaz web dinámica en **HTML/JavaScript**. Permite realizar el ciclo completo de creación, almacenamiento y consulta de facturas de manera eficiente.
+Este proyecto es una API RESTful robusta diseñada para la gestión de facturación. Está construida con **Python** y **FastAPI**, utilizando **SQLite** para la persistencia de datos de forma ligera y eficiente.
 
-## 🚀 Características
+## 🖼️ Vista Previa de la API
+![Documentación Interactiva](./assets/image_b6e343.png)
+*Interfaz de Swagger UI generada automáticamente por FastAPI.*
 
-- **API RESTful**: Construida con FastAPI para un alto rendimiento y documentación automática.
-- **Persistencia de Datos**: Uso de **SQLite** para un almacenamiento ligero y confiable.
-- **Frontend Integrado**: Interfaz de usuario sencilla y funcional en un solo lugar.
-- **Validación de Datos**: Implementación de modelos para asegurar la integridad de la información.
-- **Documentación Interactiva**: Acceso a Swagger UI para pruebas rápidas de los endpoints.
+## 🚀 Características Principales
+* **Cálculo de Totales:** El sistema calcula automáticamente el IVA y el monto total a pagar antes de guardar la factura.
+* **Validación de Datos:** Implementación de modelos con `Pydantic` para asegurar que los montos sean positivos y los datos del cliente sean válidos.
+* **Persistencia Local:** Base de datos SQL integrada que no requiere configuración de servidores externos.
+* **Documentación Técnica:** Endpoints documentados y listos para probar desde el navegador.
 
 ## 🛠️ Tecnologías Utilizadas
+* **Backend:** Python 3.10+
+* **Framework:** FastAPI
+* **Base de Datos:** SQLite3
+* **Servidor ASGI:** Uvicorn
+* **Validación:** Pydantic
 
-* **Backend:** Python 3.10+, FastAPI, Uvicorn.
-* **Base de Datos:** SQLite (SQLAlchemy/Aiosqlite).
-* **Frontend:** HTML5, CSS3, JavaScript (Fetch API).
-* **Control de Versiones:** Git & GitHub.
-
-## 📦 Instalación y Uso
+## 🔧 Instalación y Uso
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/hannerzamora1405-spec/sistema-facturacion.git](https://github.com/hannerzamora1405-spec/sistema-facturacion.git)
-   cd sistema-facturacion
+   git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
+   cd tu-repositorio
