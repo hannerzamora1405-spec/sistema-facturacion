@@ -3,7 +3,7 @@
 Este proyecto es una API RESTful robusta diseñada para la gestión de facturación. Está construida con **Python** y **FastAPI**, utilizando **SQLite** para la persistencia de datos de forma ligera y eficiente.
 
 ## 🖼️ Vista Previa de la API
-![Documentación Interactiva](./assets/image_b6e343.png)
+![Documentación Interactiva]![Vista Previa](assets/image_b6e343.png)
 *Interfaz de Swagger UI generada automáticamente por FastAPI.*
 
 ## 🚀 Características Principales
