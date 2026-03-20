@@ -18,6 +18,14 @@ Este proyecto es una API RESTful robusta diseñada para la gestión de facturaci
 * **Base de Datos:** SQLite3
 * **Servidor ASGI:** Uvicorn
 * **Validación:** Pydantic
+  
+## 📂 Estructura del Proyecto
+```text
+.
+├── assets/               # Imágenes y recursos del README
+├── main.py               # Lógica principal de FastAPI y Endpoints
+├── facturas.db           # Base de datos SQLite (se genera al iniciar)
+└── README.md             # Documentación del proyecto
 
 ## 🔧 Instalación y Uso
 
