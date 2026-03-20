@@ -1,13 +1,23 @@
 import os
 import sqlite3
 from datetime import datetime
-from typing import List
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# --- 1. CONFIGURACIÓN ---
+# 1. DEFINIR LA APP UNA SOLA VEZ
+app = FastAPI(title="Sistema de Facturación SQL")
+
+# 2. CONFIGURAR CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
+
+# --- CONFIGURACIÓN DE DB ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "facturas.db")
 
@@ -39,17 +49,7 @@ def inicializar_tabla():
 
 inicializar_tabla()
 
-app = FastAPI(title="Sistema de Facturación SQL")
-
-# --- NUEVO: CONFIGURACIÓN DE CORS (Indispensable para el index.html) ---
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# --- 2. ENDPOINTS ---
+# --- ENDPOINTS ---
 
 @app.get("/", tags=["Inicio"])
 def inicio():
@@ -64,13 +64,11 @@ def listar_facturas():
 
 @app.post("/facturas", tags=["Facturas"])
 def crear_factura(factura: Factura):
-    # 1. Realizar cálculos
     valor_iva = round(factura.monto_subtotal * factura.iva_porcentaje, 2)
     total_pagar = round(factura.monto_subtotal + valor_iva, 2)
     fecha_hoy = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
-        # 2. Conectar e Insertar en la DB
         with conectar_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -78,11 +76,19 @@ def crear_factura(factura: Factura):
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (fecha_hoy, factura.cliente, factura.nit_cc, factura.monto_subtotal, 
                   factura.iva_porcentaje, valor_iva, total_pagar))
-            
-            conn.commit() # Asegura que se guarden los cambios
-            
+            conn.commit()
         return {"mensaje": "Factura guardada", "total": total_pagar}
-    
     except Exception as e:
         print(f"Error en DB: {e}")
-        raise HTTPException(status_code=500, detail="Error interno al guardar en base de datos")
+        raise HTTPException(status_code=500, detail="Error interno")
+
+# --- ESTA FUNCIÓN DEBE ESTAR AL RAS DE LA IZQUIERDA ---
+@app.delete("/facturas/{factura_id}", tags=["Facturas"])
+def eliminar_factura(factura_id: int):
+    with conectar_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM facturas WHERE id = ?", (factura_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Factura no encontrada")
+    return {"mensaje": f"Factura {factura_id} eliminada"}
