@@ -32,6 +32,7 @@ def conectar_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+# --- 1. En inicializar_tabla añade la columna 'activa' ---
 def inicializar_tabla():
     with conectar_db() as conn:
         conn.execute("""
@@ -43,52 +44,28 @@ def inicializar_tabla():
                 subtotal REAL,
                 iva_porcentaje REAL,
                 valor_iva REAL,
-                total REAL
+                total REAL,
+                activa INTEGER DEFAULT 1  -- 1 para activa, 0 para "borrada"
             )
         """)
 
-inicializar_tabla()
-
-# --- ENDPOINTS ---
-
-@app.get("/", tags=["Inicio"])
-def inicio():
-    return {"mensaje": "Servidor Funcionando", "db": DB_PATH}
-
+# --- 2. En listar_facturas, filtramos las activas ---
 @app.get("/facturas", tags=["Facturas"])
 def listar_facturas():
     with conectar_db() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM facturas")
+        # Solo traemos las que no han sido borradas lógicamente
+        cursor.execute("SELECT * FROM facturas WHERE activa = 1")
         return [dict(f) for f in cursor.fetchall()]
 
-@app.post("/facturas", tags=["Facturas"])
-def crear_factura(factura: Factura):
-    valor_iva = round(factura.monto_subtotal * factura.iva_porcentaje, 2)
-    total_pagar = round(factura.monto_subtotal + valor_iva, 2)
-    fecha_hoy = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    try:
-        with conectar_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO facturas (fecha, cliente, nit_cc, subtotal, iva_porcentaje, valor_iva, total)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (fecha_hoy, factura.cliente, factura.nit_cc, factura.monto_subtotal, 
-                  factura.iva_porcentaje, valor_iva, total_pagar))
-            conn.commit()
-        return {"mensaje": "Factura guardada", "total": total_pagar}
-    except Exception as e:
-        print(f"Error en DB: {e}")
-        raise HTTPException(status_code=500, detail="Error interno")
-
-# --- ESTA FUNCIÓN DEBE ESTAR AL RAS DE LA IZQUIERDA ---
+# --- 3. Modificamos el endpoint DELETE ---
 @app.delete("/facturas/{factura_id}", tags=["Facturas"])
 def eliminar_factura(factura_id: int):
     with conectar_db() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM facturas WHERE id = ?", (factura_id,))
+        # En lugar de borrar, desactivamos
+        cursor.execute("UPDATE facturas SET activa = 0 WHERE id = ?", (factura_id,))
         conn.commit()
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Factura no encontrada")
-    return {"mensaje": f"Factura {factura_id} eliminada"}
+    return {"mensaje": f"Factura {factura_id} desactivada (borrado lógico)"}
